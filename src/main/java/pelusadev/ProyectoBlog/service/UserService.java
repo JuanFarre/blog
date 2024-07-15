@@ -1,6 +1,7 @@
 package pelusadev.ProyectoBlog.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import pelusadev.ProyectoBlog.model.Role;
 import pelusadev.ProyectoBlog.model.UserSec;
@@ -81,6 +82,11 @@ public class UserService implements IUserService {
         } else {
             return null; // Manejar caso donde el usuario no existe
         }
+    }
+
+    @Override
+    public String encriptPassword(String password) {
+        return new BCryptPasswordEncoder().encode(password);
     }
 
 

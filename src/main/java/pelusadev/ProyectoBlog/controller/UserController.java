@@ -3,10 +3,14 @@ package pelusadev.ProyectoBlog.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pelusadev.ProyectoBlog.model.Role;
 import pelusadev.ProyectoBlog.model.UserSec;
+import pelusadev.ProyectoBlog.service.IRoleService;
 import pelusadev.ProyectoBlog.service.IUserService;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/users")
@@ -14,6 +18,9 @@ public class UserController {
 
     @Autowired
     private IUserService userService;
+
+    @Autowired
+    private IRoleService roleService;
 
     @GetMapping("/all")
     public ResponseEntity<List<UserSec>> getAllUsers() {
@@ -27,7 +34,29 @@ public class UserController {
 
     @PostMapping("/create")
     public ResponseEntity<UserSec> createUser(@RequestBody UserSec userSec) {
-        return ResponseEntity.ok(userService.createUserSec(userSec));
+
+        Set<Role> roleList = new HashSet<Role>();
+        Role readRole;
+
+        //encriptamos contraseña
+        userSec.setPassword(userService.encriptPassword(userSec.getPassword()));
+
+        // Recuperar la Permission/s por su ID
+        for (Role role : userSec.getRolesList()){
+            readRole = roleService.getById(role.getId());
+            if (readRole != null) {
+                //si encuentro, guardo en la lista
+                roleList.add(readRole);
+            }
+        }
+
+        if (!roleList.isEmpty()) {
+            userSec.setRolesList(roleList);
+
+            UserSec newUser = userService.createUserSec(userSec);
+            return ResponseEntity.ok(newUser);
+        }
+        return null;
     }
 
     @DeleteMapping("/delete/{id}")
