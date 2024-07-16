@@ -3,6 +3,7 @@ package pelusadev.ProyectoBlog.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pelusadev.ProyectoBlog.model.Permission;
 import pelusadev.ProyectoBlog.model.Role;
@@ -23,16 +24,18 @@ public class RoleController {
     @Autowired
     private IPermissionService permissionService;
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/all")
     public ResponseEntity<List<Role>> getAllRoles() {
         return ResponseEntity.ok(roleService.findAll());
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/find/{id}")
     public ResponseEntity<Role> getRoleById(@PathVariable Long id) {
         return ResponseEntity.ok(roleService.getById(id));
     }
-
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<Role> createRole(@RequestBody Role role) {
         Set<Permission> permiList = new HashSet<Permission>();
@@ -52,6 +55,7 @@ public class RoleController {
         return ResponseEntity.ok(newRole);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteRole(@PathVariable Long id) {
         try {
@@ -65,6 +69,7 @@ public class RoleController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PatchMapping("/update/{id}")
     public ResponseEntity<Role> updateRole(@RequestBody Role role, @PathVariable Long id) {
         Role existingRole = roleService.getById(id);
